@@ -20,7 +20,40 @@ import {
 
 const { Option } = Select;
 const AutoCompleteOption = AutoComplete.Option;
-
+const residences = [
+    {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [
+            {
+                value: 'hangzhou',
+                label: 'Hangzhou',
+                children: [
+                    {
+                        value: 'xihu',
+                        label: 'West Lake',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        value: 'jiangsu',
+        label: 'Jiangsu',
+        children: [
+            {
+                value: 'nanjing',
+                label: 'Nanjing',
+                children: [
+                    {
+                        value: 'zhonghuamen',
+                        label: 'Zhong Hua Men',
+                    },
+                ],
+            },
+        ],
+    },
+];
 
 class Cuser extends Component {
     constructor() {
@@ -28,35 +61,65 @@ class Cuser extends Component {
         this.state = {
             confirmDirty: false,
             autoCompleteResult: [],
+            username: '',
+            tel: '',
+            password: '',
+            Qpassword: '',
         }
-     
+        this.changeUsername = this.changeUsername.bind(this)
+        this.changePassword = this.changePassword.bind(this)
+        this.changQpassword = this.changQpassword.bind(this)
+        this.changeTel = this.changeTel.bind(this)
         this.add = this.add.bind(this)
+
+
+
+    }
+    changeUsername(e) {
+        this.setState({
+            username: e.target.value
+        })
+    }
+    changeTel(e) {
+        this.setState({
+            tel: e.target.value
+        })
+    }
+    changePassword(e) {
+        this.setState({
+            password: e.target.value
+        })
+    }
+    changQpassword(e) {
+        this.setState({
+            Qpassword: e.target.value
+        })
     }
     success = () => {
         message.success('添加成功');
     };
     add() {
-        let {nickname,phone,password,confirm} = this.props.form.getFieldsValue();
-        
-        
+
+        let username = this.state.username;
+        let tel = this.state.tel;
+        let password = this.state.password;
         Axios.post('http://localhost:3001/reg', {
-                username: nickname,
-                tel: phone,
+            params: {
+                username: username,
+                tel: tel,
                 password: password
+            }
         }).then(({ data }) => {
             if (data.code == 1000) {
                 this.success(this)
-               this.props.form.setFieldsValue({
-                   'nickname':'',
-                   'phone':'',
-                   'password':'',
-                   'confirm':''
-               })
+                this.setState({
+                    username: '',
+                    tel: '',
+                    password: '',
+                    Qpassword: ''
+                })
             }
         })
-
-
-        // this.props.form.setFieldsValue({'nickname':123456})
 
     }
     componentWillMount() {
@@ -156,15 +219,22 @@ class Cuser extends Component {
                 >
                     {getFieldDecorator('nickname', {
                         rules: [{ required: true, message: '请输入您的用户名!', whitespace: true }],
-                        initialValue:''
-                    })(<Input id="username" />)}
+                    })(<Input
+                        value={this.state.username}
+                        onChange={this.changeUsername}   
+                    />)}
                 </Form.Item>
 
 
                 <Form.Item label="手机号">
                     {getFieldDecorator('phone', {
                         rules: [{ required: true, message: '请输入正确的手机号!' }],
-                    })(<Input addonBefore={prefixSelector}  style={{ width: '100%' }}  />)}
+                    })(<Input
+                        addonBefore={prefixSelector}
+                        style={{ width: '100%' }}
+                        value={this.state.tel}
+                        onChange={this.changeTel}
+                    />)}
                 </Form.Item>
 
 
@@ -182,8 +252,9 @@ class Cuser extends Component {
                                 validator: this.validateToNextPassword,
                             },
                         ],
-                        initialValue:''
-                    })(<Input.Password />)}
+                    })(<Input.Password
+                        value={this.state.password}
+                        onChange={this.changePassword} />)}
                 </Form.Item>
 
 
@@ -198,8 +269,11 @@ class Cuser extends Component {
                                 validator: this.compareToFirstPassword,
                             },
                         ],
-                        initialValue:''
-                    })(<Input.Password onBlur={this.handleConfirmBlur} />)}
+                    })(<Input.Password
+                        onBlur={this.handleConfirmBlur}
+                        value={this.state.Qpassword}
+                        onChange={this.changQpassword}
+                    />)}
                 </Form.Item>
                 <br />
 
