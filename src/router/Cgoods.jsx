@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 import {
     Form,
@@ -14,6 +15,8 @@ import {
     Checkbox,
     Row,
     Col,
+    input,
+    Modal, 
 } from 'antd';
 
 const { Option } = Select;
@@ -24,7 +27,9 @@ class Cgoods extends Component {
         super();
         this.state = {
             editing: false,
+            visible: false
         }
+        this.showModal = this.showModal.bind(this)
     }
 
     handleSubmit = e => {
@@ -44,6 +49,78 @@ class Cgoods extends Component {
         return e && e.fileList;
     };
 
+    showModal = () => {
+      var spname = document.querySelector('#tex').value;
+      var gid = document.querySelector('#goodsid').value;
+      var spri = document.querySelector('#price').value;
+      var opri = document.querySelector('#oprice').value;
+      var zhong = document.querySelector('.ant-select-selection-selected-value');
+      var pinzhong = document.querySelector('.ant-select-selection-selected-value');
+      var yans = '';
+      var  yan = document.querySelectorAll('.ant-select-selection__choice');
+      for(var i =0;i<yan.length;i++){
+        if(yan){
+          yans += yan[i].title
+          
+        }
+      }
+
+
+      
+      var szhong = '';
+     
+      if(pinzhong){
+        
+        szhong = pinzhong.title;
+        
+      }
+      // console.log('zizi',spname,gid,spri,opri,yans,szhong)
+      axios.post('http://localhost:3001/goods',{
+        spname,
+        gid,
+        spri,
+        opri,
+        yans,
+        szhong,
+      }).then(({data})=>{
+        if(data.code===1000){
+          this.setState({
+            visible: true,
+          });
+        }
+      })
+      
+    };
+  
+    handleOk = e => {
+     
+      document.querySelector('#tex').value='';
+      document.querySelector('#goodsid').value='';
+      document.querySelector('#price').value='';
+      document.querySelector('#oprice').value='';
+     
+      var mas =  document.querySelectorAll('.ant-select-selection__choice');
+      
+
+      if(mas.length===2){
+        mas[0].style.display='none';
+        mas[1].style.display='none';
+  
+      }
+      
+      
+      this.setState({
+        visible: false,
+      });
+
+      
+    };
+  
+    handleCancel = e => {
+      this.setState({
+        visible: false,
+      });
+    };
 
     render() {
         const { getFieldDecorator } = this.props.form;
@@ -52,117 +129,96 @@ class Cgoods extends Component {
           wrapperCol: { span: 14 },
         };
         return (
+          <>
           <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-            <Form.Item label="Plain Text">
-              <span className="ant-form-text">China</span>
+            <Form.Item label="商品名称">
+            <input id="tex" type="text" />
+             
             </Form.Item>
-            <Form.Item label="Select" hasFeedback>
+
+            <Form.Item label="商品ID">
+            <input id="goodsid" type="text" />
+             
+            </Form.Item>
+            
+
+            <Form.Item label="商品价格">
+            <input id="price" type="text" />
+             
+            </Form.Item>
+
+            <Form.Item label="商品市价">
+            <input id="oprice" type="text" />
+             
+            </Form.Item>
+            <Form.Item label="商品种类" hasFeedback>
               {getFieldDecorator('select', {
-                rules: [{ required: true, message: 'Please select your country!' }],
+                rules: [{ required: true, message: '请选择商品种类!' }],
               })(
-                <Select placeholder="Please select a country">
-                  <Option value="china">China</Option>
-                  <Option value="usa">U.S.A</Option>
+                <Select placeholder="请选择商品种类">
+                  <Option value="male">男装</Option>
+                  <Option value="famle">女装</Option>
+                  <Option value="shoe">鞋子</Option>
+                  <Option value="bag">箱包</Option>
+                  <Option value="baby">母婴</Option>
+                  <Option value="makup">美妆</Option>
+                  <Option value="home">居家</Option>
+                  <Option value="homes">家纺</Option>
+                  <Option value="tex">文体</Option>
+                  <Option value="food">美食</Option>
+                  <Option value="digital">数码</Option>
+                  <Option value="dianqi">电器</Option>
+                  <Option value="bar">内衣</Option>
+                  <Option value="shoushi">配饰</Option>
                 </Select>,
               )}
             </Form.Item>
     
-            <Form.Item label="Select[multiple]">
+            <Form.Item label="给商品指定颜色">
               {getFieldDecorator('select-multiple', {
                 rules: [
-                  { required: true, message: 'Please select your favourite colors!', type: 'array' },
+                  { required: true, message: '给商品指定颜色', type: 'array' },
                 ],
               })(
-                <Select mode="multiple" placeholder="Please select favourite colors">
-                  <Option value="red">Red</Option>
-                  <Option value="green">Green</Option>
-                  <Option value="blue">Blue</Option>
+                <Select mode="multiple" placeholder="给商品指定颜色">
+                  <Option value="red">红色</Option>
+                  <Option value="green">绿色</Option>
+                  <Option value="blue">蓝色</Option>
+                  <Option value="black">黑色</Option>
+                  <Option value="white">白色</Option>
+                </Select>,
+              )}
+            </Form.Item>
+
+            <Form.Item label="给商品指定码数">
+              {getFieldDecorator('none', {
+                rules: [
+                  { required: true, message: '给商品指定码数', type: 'array' },
+                ],
+              })(
+                <Select mode="multiple" placeholder="给商品指定码数">
+                  <Option value="M">M</Option>
+                  <Option value="S">S</Option>
+                  <Option value="X">X</Option>
+                  <Option value="XL">XL</Option>
+                  <Option value="XXL">XXL</Option>
+                  <Option value="XXXL">XXXL</Option>
+                  <Option value="XXXXL">XXXXL</Option>
                 </Select>,
               )}
             </Form.Item>
     
-            <Form.Item label="InputNumber">
-              {getFieldDecorator('input-number', { initialValue: 3 })(<InputNumber min={1} max={10} />)}
-              <span className="ant-form-text"> machines</span>
-            </Form.Item>
+            
     
-            <Form.Item label="Switch">
-              {getFieldDecorator('switch', { valuePropName: 'checked' })(<Switch />)}
-            </Form.Item>
+            
     
-            <Form.Item label="Slider">
-              {getFieldDecorator('slider')(
-                <Slider
-                  marks={{
-                    0: 'A',
-                    20: 'B',
-                    40: 'C',
-                    60: 'D',
-                    80: 'E',
-                    100: 'F',
-                  }}
-                />,
-              )}
-            </Form.Item>
-    
-            <Form.Item label="Radio.Group">
-              {getFieldDecorator('radio-group')(
-                <Radio.Group>
-                  <Radio value="a">item 1</Radio>
-                  <Radio value="b">item 2</Radio>
-                  <Radio value="c">item 3</Radio>
-                </Radio.Group>,
-              )}
-            </Form.Item>
-    
-            <Form.Item label="Radio.Button">
-              {getFieldDecorator('radio-button')(
-                <Radio.Group>
-                  <Radio.Button value="a">item 1</Radio.Button>
-                  <Radio.Button value="b">item 2</Radio.Button>
-                  <Radio.Button value="c">item 3</Radio.Button>
-                </Radio.Group>,
-              )}
-            </Form.Item>
-    
-            <Form.Item label="Checkbox.Group">
-              {getFieldDecorator('checkbox-group', {
-                initialValue: ['A', 'B'],
-              })(
-                <Checkbox.Group style={{ width: '100%' }}>
-                  <Row>
-                    <Col span={8}>
-                      <Checkbox value="A">A</Checkbox>
-                    </Col>
-                    <Col span={8}>
-                      <Checkbox disabled value="B">
-                        B
-                      </Checkbox>
-                    </Col>
-                    <Col span={8}>
-                      <Checkbox value="C">C</Checkbox>
-                    </Col>
-                    <Col span={8}>
-                      <Checkbox value="D">D</Checkbox>
-                    </Col>
-                    <Col span={8}>
-                      <Checkbox value="E">E</Checkbox>
-                    </Col>
-                  </Row>
-                </Checkbox.Group>,
-              )}
-            </Form.Item>
-    
-            <Form.Item label="Rate">
-              {getFieldDecorator('rate', {
-                initialValue: 3.5,
-              })(<Rate />)}
-            </Form.Item>
-    
-            <Form.Item label="Upload" extra="longgggggggggggggggggggggggggggggggggg">
+            {/* <Form.Item label="Upload" extra="">
               {getFieldDecorator('upload', {
                 valuePropName: 'fileList',
                 getValueFromEvent: this.normFile,
+                rules: [
+                  { required: true, message: '给商品指定图片', type: 'array' },
+                ],
               })(
                 <Upload name="logo" action="/upload.do" listType="picture">
                   <Button>
@@ -170,31 +226,23 @@ class Cgoods extends Component {
                   </Button>
                 </Upload>,
               )}
-            </Form.Item>
-    
-            <Form.Item label="Dragger">
-              <div className="dropbox">
-                {getFieldDecorator('dragger', {
-                  valuePropName: 'fileList',
-                  getValueFromEvent: this.normFile,
-                })(
-                  <Upload.Dragger name="files" action="/upload.do">
-                    <p className="ant-upload-drag-icon">
-                      <Icon type="inbox" />
-                    </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                    <p className="ant-upload-hint">Support for a single or bulk upload.</p>
-                  </Upload.Dragger>,
-                )}
-              </div>
-            </Form.Item>
+            </Form.Item> */}
     
             <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
-              <Button type="primary" htmlType="submit">
+              <Button onClick={this.showModal.bind(this)} type="primary" htmlType="submit">
                 Submit
               </Button>
             </Form.Item>
           </Form>
+          <Modal
+          title="Basic Modal"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+        >
+          <p>添加新商品成功！</p>
+        </Modal>
+        </>
         );
       }
 }
