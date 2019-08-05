@@ -60,7 +60,7 @@ class Cuser extends Component {
 
     }
     componentWillMount() {
-        console.log(this.props);
+        // console.log(this.props);
     }
     handleSubmit = e => {
         e.preventDefault();
