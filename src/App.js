@@ -3,6 +3,11 @@ import {withRouter} from 'react-router-dom';
 import Home from './router/Home.jsx'
 import Login from './router/Login.jsx'
 
+//引进redux 
+import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import loginAction from './stote/loginAction';
+
 function getCookie(cookie_name) {
     var allcookies = document.cookie;
     //索引长度，开始索引的位置
@@ -30,23 +35,14 @@ class App extends Component{
     constructor(props){
         super();
         this.state = {
-            status : true
         }
     }
-    // componentDidMount(){
-    //     console.log(this.state) 
-    //     let name = getCookie('username')
-    //     if(!name)
-    //         this.setState({status : false})
-    //     else
-    //         this.setState({status : true})
-        
-    // }
+     
   render(){
     return (
         <div className="App">
             {
-                this.state.status ? <Home/> : <Login/>
+                this.props.status ? <Home/> : <Login/>
             }
             
         </div>
@@ -56,4 +52,19 @@ class App extends Component{
 }
 
 App = withRouter(App);
+
+//利用高阶组件connect连接当前组件与store
+//把store中的数据通过props传入当前组件
+
+let mapStateToProps = (state)=>{
+    return{
+        status : state.status
+    }
+}
+let mapDispacthToProps = (dispatch)=>{
+    return bindActionCreators(loginAction,dispatch)
+}
+
+
+App = connect(mapStateToProps,mapDispacthToProps)(App)
 export default App;

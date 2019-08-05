@@ -6,10 +6,18 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.css';
 
+//引入react-redux
+import {Provider} from 'react-redux';
+
+import store from './stote'
+
 ReactDOM.render(
-    <HashRouter>
-        <App />
-    </HashRouter>, 
+    <Provider store={store}>
+        <HashRouter>
+            <App />
+        </HashRouter>
+    </ Provider>
+    , 
 document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
